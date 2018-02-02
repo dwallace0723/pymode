@@ -15,13 +15,12 @@ import pymode
 
 # First create a Mode instance:
 
-# Explicitly setting api token and api password
+# Explicitly setting API token and API password
 m = Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
 
-# api token and api password set as environment variables
+# API token and API password set as environment variables
 m = Mode('<your-org-name>')
 
-for space in m.get_spaces():
-    r = space.get_reports()
-    print r.name
+for report in m.get_space('<space-token>').get_reports():
+    report.run()
 ```
