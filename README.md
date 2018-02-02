@@ -8,7 +8,7 @@ PyMode is a Python library to enable typed interactions with the [Mode Analytics
 pip install pymode
 ```
 
-### Usage
+### Example Usage
 
 ```
 import pymode
