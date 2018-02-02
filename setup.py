@@ -1,5 +1,4 @@
 import setuptools
-import pymode
 
 if __name__ == "__main__":
     setuptools.setup(
