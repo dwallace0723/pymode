@@ -13,7 +13,7 @@ pip install pymode
 ```
 import pymode
 
-m = Mode('<you-org-name')
+m = Mode('<your-org-name>')
 
 for space in m.get_spaces():
     r = space.get_reports()
