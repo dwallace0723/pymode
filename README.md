@@ -13,6 +13,12 @@ pip install pymode
 ```
 import pymode
 
+# First create a Mode instance:
+
+# Explicitly setting api token and api password
+m = Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
+
+# api token and api password set as environment variables
 m = Mode('<your-org-name>')
 
 for space in m.get_spaces():
