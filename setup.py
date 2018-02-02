@@ -3,7 +3,7 @@ import pymode
 
 if __name__ == "__main__":
     setuptools.setup(
-        name="PyMode",
+        name="pymode",
         version="1.0.1a1",
         description="Typed interactions with the Mode Analytics API",
         keywords=["mode analytics", "api"],
