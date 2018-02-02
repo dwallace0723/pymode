@@ -20,7 +20,7 @@ if __name__ == "__main__":
         maintainer_email="dwallace0723@gmail.com",
         url="https://github.com/dwallace0723/pymode",
         license="MIT",
-        packages=setuptools.find_packages(),
+        packages=["pymode"],
         install_requires=['requests'],
         python_requires='>=3'
     )
