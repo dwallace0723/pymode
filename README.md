@@ -21,6 +21,17 @@ m = Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
 # API token and API password set as environment variables
 m = Mode('<your-org-name>')
 
-for report in m.get_space('<space-token>').get_reports():
-    report.run()
+# Archive "Untitled Reports" in your Personal space
+spaces = m.get_spaces()
+
+for space in spaces:
+    if space.name == 'Personal':
+        reports = space.get_reports()
+        for report in reports:
+            if not report.name:
+                if not report.archived:
+                    report.archive()
+                else:
+                    print('Skipped Report {}: already archived'.format(report.token))
+        break
 ```
