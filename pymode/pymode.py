@@ -72,6 +72,10 @@ class Mode(object):
 		resp = self.requester._get('/reports/{}'.format(report_token))
 		return Report(resp, self.requester)
 
+	def get_report_run(self, report_token, report_run_token):
+		resp = self.requester._get('/reports/{}/runs/{}'.format(report_token, report_run_token))
+		return ReportRun(resp, report_token, self.requester)
+
 	def get_query(self, report_token, query_token):
 		resp = self.requester._get('/reports/{}/queries/{}'.format(report_token, query_token))
 		return Query(resp, report_token, self.requester)
@@ -220,12 +224,34 @@ class Report(object):
 
 		return resp
 
+	def get_runs(self):
+		resp = self.requester._get('/reports/{}/runs'.format(self.token))
+		report_runs = resp.get('_embedded').get('report_runs')
+		report_run_list = [ReportRun(report_run, self.token, self.requester) for report_run in report_runs]
+
+		return report_run_list
+
 	def get_queries(self):
 		resp = self.requester._get('/reports/{}/queries'.format(self.token))
 		queries = resp.get('_embedded').get('queries')
 		query_list = [Query(query, self.token, self.requester) for query in queries]
 
 		return query_list
+
+class ReportRun(object):
+
+	def __init__(self, data, report_token, requester):
+		self.token = data.get('token')
+		self.state = data.get('state')
+		self.parameters = data.get('parameters')
+		self.created_at = data.get('created_at')
+		self.completed_at = data.get('completed_at')
+		self.python_state = data.get('python_state')
+		self.form_fields = data.get('form_fields')
+		self.executed_by = data.get('_links').get('executed_by').get('href')
+		self.report_token = report_token
+
+		self.requester = requester
 
 
 class Query(object):
