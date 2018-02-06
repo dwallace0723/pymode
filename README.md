@@ -16,7 +16,7 @@ import pymode
 # First create a Mode instance:
 
 # You can explicitly set the API token and API password
-m = pymode.Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
+m = pymode.Mode('<your-org-name>','<your-mode-api-token>','<your-mode-api-password>')
 
 # Or your API token and API password can be set as environment variables
 m = pymode.Mode('<your-org-name>')
