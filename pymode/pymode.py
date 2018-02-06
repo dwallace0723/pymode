@@ -68,6 +68,13 @@ class Mode(object):
 
 		return data_sources
 
+	def get_definitions(self):
+		resp = self.requester._get('/definitions')
+		definitions = resp.get('_embedded').get('definitions')
+		definitions = [Definition(definition, self.requester) for definition in definitions]
+
+		return definitions
+
 	def get_report(self, report_token):
 		resp = self.requester._get('/reports/{}'.format(report_token))
 		return Report(resp, self.requester)
@@ -89,7 +96,32 @@ class Mode(object):
 		spaces = resp.get('_embedded').get('spaces')
 		spaces_list = [Space(space, self.requester) for space in spaces]
 
+		if resp.get('pagination'):
+			while resp.get('pagination').get('page') < resp.get('pagination').get('total_pages'):
+				next_page = resp.get('pagination').get('page')+1
+				resp = self.requester._get('/spaces?page={}'.format(self.token, next_page))
+				spaces = resp.get('_embedded').get('spaces')
+				for space in spaces:
+					space_instance = Space(space, self.token, self.requester)
+					spaces_list.append(space_instance)
+
 		return spaces_list
+
+class Definition(object):
+
+	def __init__(self, data, requester):
+		self.token = data.get('token')
+		self.id = data.get('id')
+		self.name = data.get('name')
+		self.description = data.get('description')
+		self.source = data.get('source')
+		self.data_source_id = data.get('data_source_id')
+		self.created_at = data.get('created_at')
+		self.updated_at = data.get('updated_at')
+		self.last_successful_github_sync_id = data.get('last_successful_github_sync_id')
+		self.last_successful_sync_at = data.get('last_successful_sync_at')
+
+		self.requester = requester
 
 class DataSource(object):
 
@@ -143,6 +175,15 @@ class Space(object):
 		resp = self.requester._get('/spaces/{}/reports'.format(self.token))
 		reports = resp.get('_embedded').get('reports')
 		report_list = [Report(report, self.requester) for report in reports]
+
+		if resp.get('pagination'):
+			while resp.get('pagination').get('page') < resp.get('pagination').get('total_pages'):
+				next_page = resp.get('pagination').get('page')+1
+				resp = self.requester._get('/spaces/{}/reports?page={}'.format(self.token, next_page))
+				reports = resp.get('_embedded').get('reports')
+				for report in reports:
+					report_instance = Report(report, self.token, self.requester)
+					report_list.append(report_instance)
 
 		return report_list
 
@@ -229,12 +270,30 @@ class Report(object):
 		report_runs = resp.get('_embedded').get('report_runs')
 		report_run_list = [ReportRun(report_run, self.token, self.requester) for report_run in report_runs]
 
+		if resp.get('pagination'):
+			while resp.get('pagination').get('page') < resp.get('pagination').get('total_pages'):
+				next_page = resp.get('pagination').get('page')+1
+				resp = self.requester._get('/reports/{}/runs?page={}'.format(self.token, next_page))
+				report_runs = resp.get('_embedded').get('report_runs')
+				for report_run in report_runs:
+					report_run_instance = ReportRun(report_run, self.token, self.requester)
+					report_run_list.append(report_run_instance)
+
 		return report_run_list
 
 	def get_queries(self):
 		resp = self.requester._get('/reports/{}/queries'.format(self.token))
 		queries = resp.get('_embedded').get('queries')
 		query_list = [Query(query, self.token, self.requester) for query in queries]
+
+		if resp.get('pagination'):
+			while resp.get('pagination').get('page') < resp.get('pagination').get('total_pages'):
+				next_page = resp.get('pagination').get('page')+1
+				resp = self.requester._get('/reports/{}/queries?page={}'.format(self.token, next_page))
+				queries = resp.get('_embedded').get('queries')
+				for query in queries:
+					query_instance = Query(query, self.token, self.requester)
+					query_list.append(query_instance)
 
 		return query_list
 
