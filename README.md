@@ -16,10 +16,10 @@ import pymode
 # First create a Mode instance:
 
 # You can explicitly set the API token and API password
-m = Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
+m = pymode.Mode('<your-org-name>','you-mode-api-token','your-mode-api-password')
 
 # Or your API token and API password can be set as environment variables
-m = Mode('<your-org-name>')
+m = pymode.Mode('<your-org-name>')
 
 # Archive "Untitled Reports" in your Personal space
 spaces = m.get_spaces()
