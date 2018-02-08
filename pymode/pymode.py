@@ -49,7 +49,7 @@ class Mode(object):
 	def get_memberships(self):
 		resp = self.requester._get('/memberships')
 		memberships = resp.get('_embedded').get('memberships')
-		memberships = [Membership(membership) for membership in memberships]
+		memberships = [Membership(membership, self.requester) for membership in memberships]
 
 		return memberships
 
@@ -190,8 +190,8 @@ class Space(object):
 class Membership(object):
 
 	def __init__(self, data, requester):
-		self.token = data.get('_links').get('self').get('href')
-		self.user = data.get('_links').get('self').get('user')
+		self.token = data.get('_links').get('self').get('href').split('memberships/')[1]
+		self.user = data.get('_links').get('user').get('href').split('api/')[1]
 		self.admin = data.get('admin')
 
 		self.requester = requester
@@ -206,6 +206,8 @@ class User(object):
 		self.email = data.get('email')
 		self.email_verified = data.get('email_verified')
 		self.user = data.get('user')
+
+		self.requester = requester
 
 class Report(object):
 
@@ -235,6 +237,7 @@ class Report(object):
 		self.last_run_at = data.get('last_run_at')
 		self.web_preview_image = data.get('web_preview_image')
 		self.last_successful_run_token = data.get('last_successful_run_token')
+		self.published = data.get('_forms').get('edit').get('input').get('report').get('published').get('value')
 
 		self.requester = requester
 
@@ -251,6 +254,7 @@ class Report(object):
 		resp = self.requester._patch('/reports/{}/archive'.format(self.token))
 		if resp.status_code == requests.codes.ok:
 			print('Report {} ({}) archived'.format(self.token, self.name))
+			self.archived = True
 		else:
 			print('Report {} ({}) failed to archive'.format(self.token, self.name))
 
@@ -260,8 +264,18 @@ class Report(object):
 		resp = self.requester._patch('/reports/{}/unarchive'.format(self.token))
 		if resp.status_code == requests.codes.ok:
 			print('Report {} ({}) unarchived'.format(self.token, self.name))
+			self.acrhived = False
 		else:
 			print('Report {} ({}) failed to unarchive'.format(self.token, self.name))
+
+		return resp
+
+	def delete(self):
+		resp = self.requester._delete('/reports/{}'.format(self.token))
+		if resp.status_code == requests.codes.ok:
+			print('Report {} ({}) deleted'.format(self.token, self.name))
+		else:
+			print('Report {} ({}) failed to delete'.format(self.token, self.name))
 
 		return resp
 
@@ -296,6 +310,111 @@ class Report(object):
 					query_list.append(query_instance)
 
 		return query_list
+
+	def update_description(self, description):
+		if self.description == description:
+			print('Report {} ({}) skipped'.format(self.token, self.name))
+		else:
+			payload = {'report':{
+				'name': self.name,
+				'layout': self.layout,
+				'description': description,
+				'account_id': self.account_id,
+				'space_token': self.space_token,
+				'published': self.published
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}'.format(self.token), payload=payload)
+			if resp.status_code == 202:
+				print('Report {} ({}) description updated'.format(self.token, self.name, description))
+				self.description = description
+			else:
+				print('Report {} ({}) failed to update description'.format(self.token, self.name, description))
+
+		return resp
+
+	def update_space(self, space_token):
+		if self.space_token == space_token:
+			print('Report {} ({}) already in Space {}'.format(self.token, self.name, space_token))
+		else:
+			payload = {'report':{
+				'name': self.name,
+				'layout': self.layout,
+				'description': self.description,
+				'account_id': self.account_id,
+				'space_token': space_token,
+				'published': self.published
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}'.format(self.token), payload=payload)
+			if resp.status_code == 202:
+				print('Report {} ({}) moved to Space {}'.format(self.token, self.name, space_token))
+				self.space_token = space_token
+			else:
+				print('Report {} ({}) failed to move to Space {}'.format(self.token, self.name, space_token))
+
+		return resp
+
+	def update_name(self, name):
+		if self.name == name:
+			print('Report {} ({}) already named {}'.format(self.token, self.name, name))
+		else:
+			payload = {'report':{
+				'name': name,
+				'layout': self.layout,
+				'description': self.description,
+				'account_id': self.account_id,
+				'space_token': self.space_token,
+				'published': self.published
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}'.format(self.token), payload=payload)
+			if resp.status_code == 202:
+				print('Report {} ({}) renamed to {}'.format(self.token, self.name, name))
+				self.name = name
+			else:
+				print('Report {} ({}) failed to rename to {}'.format(self.token, self.name, name))
+
+		return resp
+
+	def sync_to_github(self, commit_msg):
+		payload = {'commit_message': commit_msg}
+		resp = self.requester._patch('/reports/{}/sync_to_github'.format(self.token), payload=payload)
+		if resp.status_code == requests.codes.ok:
+			print('Report {} ({}) synced to GitHub'.format(self.token, self.name))
+		else:
+			print('Report {} ({}) failed to sync to GitHub'.format(self.token, self.name))
+
+		return resp
+
+	def disable_external_sharing(self):
+		if not self.shared:
+			resp = 'Skipped: External sharing already disabled for Report {} ({})'.format(self.token, self.name)
+		else:
+			resp = self.requester._patch('/reports/{}/external_sharing/disable'.format(self.token))
+			if resp.status_code == requests.codes.ok:
+				print('Success: External sharing disabled for Report {} ({})'.format(self.token, self.name))
+				self.shared = False
+			else:
+				print('Fail: Failed to disable external sharing for Report {} ({})'.format(self.token, self.name))
+
+		return resp
+
+	def enable_external_sharing(self):
+		if self.shared:
+			resp = 'Skipped: External sharing already enabled for Report {} ({})'.format(self.token, self.name)
+		else:
+			resp = self.requester._patch('/reports/{}/external_sharing/enable'.format(self.token))
+			if resp.status_code == requests.codes.ok:
+				print('Success: External sharing enabled for Report {} ({})'.format(self.token, self.name))
+				self.shared = True
+			else:
+				print('Fail: Failed to enable external sharing for Report {} ({})'.format(self.token, self.name))
+
+		return resp
 
 class ReportRun(object):
 
@@ -332,9 +451,98 @@ class Query(object):
 
 	def delete(self):
 		resp = self.requester._delete('/reports/{}/queries/{}'.format(self.report_token, self.token))
+		if resp.status_code == requests.codes.ok:
+			print('Query {} ({}) deleted'.format(self.token, self.name))
+		else:
+			print('Query {} ({}) failed to delete'.format(self.token, self.name))
+
 		return resp
 
 	def update_name(self, new_name):
-		values = {"query":{"name":{"value":new_name}}}
-		resp = self.requester._patch(url_suffix='/reports/{}/queries/{}'.format(self.report_token, self.token), payload=values)
+		if self.name == new_name:
+			resp = 'Skipped: Query {} already named {}'.format(self.token, self.name)
+		else:
+			payload = {'query':{
+				'raw_query': self.raw_query,
+				'name': new_name,
+				'data_source_id': self.data_source_id
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}/queries/{}'.format(self.report_token, self.token), payload=payload)
+			if resp.status_code == requests.codes.ok:
+				print('Query {} ({}) renamed to {}'.format(self.token, self.name, new_name))
+				self.name = new_name
+			else:
+				print('Query {} ({}) failed to rename to {}'.format(self.token, self.name, new_name))
+
 		return resp
+
+	def update_raw_query(self, raw_query):
+		if self.raw_query == raw_query:
+			resp = 'Skipped: Query {} already has new query'.format(self.token)
+		else:
+			payload = {'query':{
+				'raw_query': raw_query,
+				'name': self.name,
+				'data_source_id': self.data_source_id
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}/queries/{}'.format(self.report_token, self.token), payload=payload)
+			if resp.status_code == requests.codes.ok:
+				print('Query {} ({}) raw query updated'.format(self.token, self.name))
+				self.raw_query = raw_query
+			else:
+				print('Query {} ({}) failed to update raw query'.format(self.token, self.name))
+
+		return resp
+
+
+	def update_data_source(self, data_source_id):
+		if self.data_source_id == data_source_id:
+			resp = 'Skipped: Query {} already uses data source {}'.format(self.token. self.data_source_id)
+		else:
+			payload = {'query':{
+				'raw_query': self.raw_query,
+				'name': self.name,
+				'data_source_id': data_source_id
+				}
+			}
+
+			resp = self.requester._patch('/reports/{}/queries/{}'.format(self.report_token, self.token), payload=payload)
+			if resp.status_code == requests.codes.ok:
+				print('Query {} ({}) data source updated'.format(self.token, self.name))
+				self.data_source_id = data_source_id
+			else:
+				print('Query {} ({}) failed to update data source'.format(self.token, self.name))
+
+		return resp
+
+	def get_charts(self):
+		resp = self.requester._get('/reports/{}/queries/{}/charts'.format(self.report_token, self.token))
+		charts = resp.get('_embedded').get('charts')
+		chart_list = [Chart(chart, self.report_token, self.token, self.requester) for chart in charts]
+
+		if resp.get('pagination'):
+			while resp.get('pagination').get('page') < resp.get('pagination').get('total_pages'):
+				next_page = resp.get('pagination').get('page')+1
+				resp = self.requester._get('/reports/{}/queries/{}/charts?page={}'.format(self.report_token, self.token, next_page))
+				charts = resp.get('_embedded').get('charts')
+				for chart in charts:
+					chart_instance = Chart(chart, self.report_token, self.token, self.requester)
+					chart_list.append(chart_instance)
+
+		return chart_list
+
+
+class Chart(object):
+
+	def __init__(self, data, report_token, query_token, requester):
+		self.token = data.get('token')
+		self.created_at = data.get('created_at')
+		self.color_palatte_token = data.get('color_palette_token')
+		self.report_token = report_token
+		self.query_token = query_token
+
+		self.requester = requester
