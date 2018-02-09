@@ -251,22 +251,28 @@ class Report(object):
 		return resp
 
 	def archive(self):
-		resp = self.requester._patch('/reports/{}/archive'.format(self.token))
-		if resp.status_code == requests.codes.ok:
-			print('Report {} ({}) archived'.format(self.token, self.name))
-			self.archived = True
+		if self.archived:
+			resp = 'Skipped: Report {} ({}) already archived'.format(self.token, self.name)
 		else:
-			print('Report {} ({}) failed to archive'.format(self.token, self.name))
+			resp = self.requester._patch('/reports/{}/archive'.format(self.token))
+			if resp.status_code == requests.codes.ok:
+				print('Report {} ({}) archived'.format(self.token, self.name))
+				self.archived = True
+			else:
+				print('Report {} ({}) failed to archive'.format(self.token, self.name))
 
 		return resp
 
 	def unarchive(self):
-		resp = self.requester._patch('/reports/{}/unarchive'.format(self.token))
-		if resp.status_code == requests.codes.ok:
-			print('Report {} ({}) unarchived'.format(self.token, self.name))
-			self.acrhived = False
+		if not self.archived:
+			resp = 'Skipped: Report {} ({}) not archived'.format(self.token, self.name)
 		else:
-			print('Report {} ({}) failed to unarchive'.format(self.token, self.name))
+			resp = self.requester._patch('/reports/{}/unarchive'.format(self.token))
+			if resp.status_code == requests.codes.ok:
+				print('Report {} ({}) unarchived'.format(self.token, self.name))
+				self.archived = False
+			else:
+				print('Report {} ({}) failed to unarchive'.format(self.token, self.name))
 
 		return resp
 
