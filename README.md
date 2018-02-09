@@ -29,9 +29,6 @@ for space in spaces:
         reports = space.get_reports()
         for report in reports:
             if not report.name:
-                if not report.archived:
-                    report.archive()
-                else:
-                    print('Skipped Report {}: already archived'.format(report.token))
+                report.archive()
         break
 ```
