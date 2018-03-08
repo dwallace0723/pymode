@@ -319,7 +319,7 @@ class Report(object):
 
 	def update_description(self, description):
 		if self.description == description:
-			print('Report {} ({}) skipped'.format(self.token, self.name))
+			resp = 'Skipped: Report {} ({}) skipped'.format(self.token, self.name)
 		else:
 			payload = {'report':{
 				'name': self.name,
@@ -342,7 +342,7 @@ class Report(object):
 
 	def update_space(self, space_token):
 		if self.space_token == space_token:
-			print('Report {} ({}) already in Space {}'.format(self.token, self.name, space_token))
+			resp = 'Skipped: Report {} ({}) already in Space {}'.format(self.token, self.name, space_token)
 		else:
 			payload = {'report':{
 				'name': self.name,
@@ -365,7 +365,7 @@ class Report(object):
 
 	def update_name(self, name):
 		if self.name == name:
-			print('Report {} ({}) already named {}'.format(self.token, self.name, name))
+			resp = 'Skipped: Report {} ({}) already named {}'.format(self.token, self.name, name)
 		else:
 			payload = {'report':{
 				'name': name,
