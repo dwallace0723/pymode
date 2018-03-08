@@ -1,11 +1,11 @@
 ## PyMode
 
-PyMode is a Python library to enable typed interactions with the [Mode Analytics API](http://developer.modeanalytics.com/).
+PyMode is a Python 3.x library to enable typed interactions with the [Mode Analytics API](http://developer.modeanalytics.com/).
 
 ### Installation
 
 ```
-pip install pymode
+$ pip install pymode
 ```
 
 ### Example Usage
@@ -15,7 +15,7 @@ import pymode
 
 # First create a Mode instance:
 
-# You can explicitly set the API token and API password
+# You can explicitly pass in the API token and API password
 m = pymode.Mode('<your-org-name>','<your-mode-api-token>','<your-mode-api-password>')
 
 # Or your API token and API password can be set as environment variables
