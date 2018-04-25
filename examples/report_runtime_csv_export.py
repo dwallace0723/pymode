@@ -28,7 +28,7 @@ for space in spaces:
 
 keys = reports_attributes[0].keys()
 
-# Write ou the CSV
+# Write out the CSV
 with open('reports.csv', 'w') as output_file:
     dict_writer = csv.DictWriter(output_file, keys)
     dict_writer.writeheader()
