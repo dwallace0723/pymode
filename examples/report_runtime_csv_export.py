@@ -1,11 +1,16 @@
 import pymode
 import csv
 
-m = pymode.Mode('<your-org-name>','<your-api-token>','<your-api-password>')
+ORG = 'your-org-name-here'
+API_TOKEN = 'your-api-token-here'
+API_PASSWORD = 'your-api-password-here'
+
+m = pymode.Mode(ORG, API_TOKEN, API_PASSWORD)
 
 # Empty array for report attributes that we want
 reports_attributes = []
-base_url = 'https://modeanalytics.com/rjmetrics/reports/'
+
+base_url = 'https://modeanalytics.com/{}/reports/'.format(ORG)
 
 # Iterate through spaces and get reports for them
 spaces = m.get_spaces()
@@ -13,7 +18,7 @@ spaces = m.get_spaces()
 for space in spaces:
 	reports = space.get_reports()
 
-# For each report grab relevant information and put it into the reports_attributes 
+# For each report grab relevant information and put it into the reports_attributes
 	for report in reports:
 		report_url = base_url + report.token
 		report_name = report.name
