@@ -92,7 +92,7 @@ class Mode(object):
 		return Space(resp, self.requester)
 
 	def get_spaces(self):
-		resp = self.requester._get('/spaces')
+		resp = self.requester._get('/spaces?filter=all')
 		spaces = resp.get('_embedded').get('spaces')
 		spaces_list = [Space(space, self.requester) for space in spaces]
 
