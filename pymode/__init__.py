@@ -1,1 +1,1 @@
-from pymode.pymode import *
+from pymode.client import Mode  # noqa
