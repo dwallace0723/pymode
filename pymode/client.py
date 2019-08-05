@@ -97,7 +97,7 @@ class Mode:
 
     def list_memberships(self) -> list:
         resp = self._get(url_suffix="/memberships")
-        return resp.get('_embedded').get('memberships')
+        return resp.get("_embedded").get("memberships")
 
     def get_membership(self, membership_token: str) -> dict:
         resp = self._get(url_suffix=f"/memberships/{membership_token}")
