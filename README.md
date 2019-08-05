@@ -1,34 +1,30 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.com/dwallace0723/pystitch.svg?branch=master)](https://travis-ci.com/dwallace0723/pystitch)
+[![Python Versions](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue.svg)](https://pypi.python.org/pypi/ansicolortags/)
+
 ## PyMode
 
-PyMode is a Python 3.x library to enable typed interactions with the [Mode Analytics API](http://developer.modeanalytics.com/).
+PyMode is a Python 3.x library to enable typed interactions with the [Mode Analytics v2 API](http://developer.modeanalytics.com/).
 
 ### Installation
 
-```
+```bash
 $ pip install pymode
 ```
 
 ### Example Usage
 
-```
+```python
+import os
 import pymode
 
-# First create a Mode instance:
+ACCOUNT_NAME = os.environ["MODE_ACCOUNT_NAME"]
+TOKEN = os.environ["MODE_API_TOKEN"]
+PASSWORD = os.environ["MODE_API_PASSWORD"]
 
-# You can explicitly pass in the API token and API password
-m = pymode.Mode('<your-org-name>','<your-mode-api-token>','<your-mode-api-password>')
+mode = pymode.Mode(account_name=MODE_ACCOUNT_NAME, token=TOKEN, password=PASSWORD)
 
-# Or your API token and API password can be set as environment variables
-m = pymode.Mode('<your-org-name>')
-
-# Archive "Untitled Reports" in your Personal space
-spaces = m.get_spaces()
-
-for space in spaces:
-    if space.name == 'Personal':
-        reports = space.get_reports()
-        for report in reports:
-            if not report.name:
-                report.archive()
-        break
+for space in mode.list_spaces():
+    for report in mode.list_reports(space_token=space.get('token')):
+        print(report.get('name'))
 ```
