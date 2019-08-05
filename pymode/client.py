@@ -51,6 +51,19 @@ class Mode:
         response.raise_for_status()
         return response.json()
 
+    def _delete(self, url_suffix: str, params: dict = None, data: dict = None) -> dict:
+        url = self.BASE_URL + self.account_name + url_suffix
+        headers = self._construct_headers()
+        response = requests.delete(
+            url,
+            auth=(self.token, self.password),
+            headers=headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response.json()
+
     def list_spaces(self) -> list:
         resp = self._get(url_suffix="/spaces?filter=all")
         return resp.get("_embedded").get("spaces")
@@ -80,4 +93,16 @@ class Mode:
 
     def unarchive_report(self, report_token: str):
         resp = self._patch(url_suffix=f"/reports/{report_token}/unarchive")
+        return resp
+
+    def list_memberships(self) -> list:
+        resp = self._get(url_suffix="/memberships")
+        return resp.get('_embedded').get('memberships')
+
+    def get_membership(self, membership_token: str) -> dict:
+        resp = self._get(url_suffix=f"/memberships/{membership_token}")
+        return resp
+
+    def delete_membership(self, membership_token: str) -> dict:
+        resp = self._delete(url_suffix=f"/memberships/{membership_token}")
         return resp
