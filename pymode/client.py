@@ -74,14 +74,18 @@ class Mode:
 
     def list_reports(self, space_token: str) -> list:
         page = 1
-        resp = self._get(url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}")
+        resp = self._get(
+            url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}"
+        )
         reports = resp.get("_embedded").get("reports")
         all_reports = reports.copy()
 
         # handle pagination
         while len(reports) == 30:
             page += 1
-            resp = self._get(url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}")
+            resp = self._get(
+                url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}"
+            )
             reports = resp.get("_embedded").get("reports")
             all_reports.extend(reports)
 
@@ -92,11 +96,15 @@ class Mode:
         return resp
 
     def archive_report(self, report_token: str):
-        resp = self._patch(url_suffix=f"/{self.account_name}/reports/{report_token}/archive")
+        resp = self._patch(
+            url_suffix=f"/{self.account_name}/reports/{report_token}/archive"
+        )
         return resp
 
     def unarchive_report(self, report_token: str):
-        resp = self._patch(url_suffix=f"/{self.account_name}/reports/{report_token}/unarchive")
+        resp = self._patch(
+            url_suffix=f"/{self.account_name}/reports/{report_token}/unarchive"
+        )
         return resp
 
     def list_memberships(self) -> list:
@@ -104,11 +112,15 @@ class Mode:
         return resp.get("_embedded").get("memberships")
 
     def get_membership(self, membership_token: str) -> dict:
-        resp = self._get(url_suffix=f"/{self.account_name}/memberships/{membership_token}")
+        resp = self._get(
+            url_suffix=f"/{self.account_name}/memberships/{membership_token}"
+        )
         return resp
 
     def delete_membership(self, membership_token: str) -> dict:
-        resp = self._delete(url_suffix=f"/{self.account_name}/memberships/{membership_token}")
+        resp = self._delete(
+            url_suffix=f"/{self.account_name}/memberships/{membership_token}"
+        )
         return resp
 
     def get_user(self, username: str) -> dict:
