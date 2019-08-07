@@ -2,7 +2,7 @@ import requests
 
 
 class Mode:
-    BASE_URL = "https://modeanalytics.com/api/"
+    BASE_URL = "https://modeanalytics.com/api"
 
     def __init__(self, token, password, account_name):
         self.token = token
@@ -17,7 +17,7 @@ class Mode:
         return headers
 
     def _get(self, url_suffix: str, params: dict = None) -> dict:
-        url = self.BASE_URL + self.account_name + url_suffix
+        url = self.BASE_URL + url_suffix
         headers = self._construct_headers()
         response = requests.get(
             url, auth=(self.token, self.password), headers=headers, params=params
@@ -26,7 +26,7 @@ class Mode:
         return response.json()
 
     def _post(self, url_suffix: str, params: dict = None, data: dict = None) -> dict:
-        url = self.BASE_URL + self.account_name + url_suffix
+        url = self.BASE_URL + url_suffix
         headers = self._construct_headers()
         response = requests.post(
             url,
@@ -39,7 +39,7 @@ class Mode:
         return response.json()
 
     def _patch(self, url_suffix: str, params: dict = None, data: dict = None) -> dict:
-        url = self.BASE_URL + self.account_name + url_suffix
+        url = self.BASE_URL + url_suffix
         headers = self._construct_headers()
         response = requests.patch(
             url,
@@ -52,7 +52,7 @@ class Mode:
         return response.json()
 
     def _delete(self, url_suffix: str, params: dict = None, data: dict = None) -> dict:
-        url = self.BASE_URL + self.account_name + url_suffix
+        url = self.BASE_URL + url_suffix
         headers = self._construct_headers()
         response = requests.delete(
             url,
@@ -65,44 +65,52 @@ class Mode:
         return response.json()
 
     def list_spaces(self) -> list:
-        resp = self._get(url_suffix="/spaces?filter=all")
+        resp = self._get(url_suffix=f"/{self.account_name}/spaces?filter=all")
         return resp.get("_embedded").get("spaces")
 
     def get_space(self, space_token) -> dict:
-        resp = self._get(url_suffix=f"/spaces/{space_token}")
+        resp = self._get(url_suffix=f"/{self.account_name}/spaces/{space_token}")
         return resp
 
     def list_reports(self, space_token: str) -> list:
         page = 1
-        resp = self._get(url_suffix=f"/spaces/{space_token}/reports?page={page}")
+        resp = self._get(url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}")
         reports = resp.get("_embedded").get("reports")
         all_reports = reports.copy()
 
         # handle pagination
         while len(reports) == 30:
             page += 1
-            resp = self._get(url_suffix=f"/spaces/{space_token}/reports?page={page}")
+            resp = self._get(url_suffix=f"/{self.account_name}/spaces/{space_token}/reports?page={page}")
             reports = resp.get("_embedded").get("reports")
             all_reports.extend(reports)
 
         return all_reports
 
+    def get_report(self, report_token: str) -> dict:
+        resp = self._get(url_suffix=f"/{self.account_name}/reports/{report_token}")
+        return resp
+
     def archive_report(self, report_token: str):
-        resp = self._patch(url_suffix=f"/reports/{report_token}/archive")
+        resp = self._patch(url_suffix=f"/{self.account_name}/reports/{report_token}/archive")
         return resp
 
     def unarchive_report(self, report_token: str):
-        resp = self._patch(url_suffix=f"/reports/{report_token}/unarchive")
+        resp = self._patch(url_suffix=f"/{self.account_name}/reports/{report_token}/unarchive")
         return resp
 
     def list_memberships(self) -> list:
-        resp = self._get(url_suffix="/memberships")
+        resp = self._get(url_suffix=f"/{self.account_name}/memberships")
         return resp.get("_embedded").get("memberships")
 
     def get_membership(self, membership_token: str) -> dict:
-        resp = self._get(url_suffix=f"/memberships/{membership_token}")
+        resp = self._get(url_suffix=f"/{self.account_name}/memberships/{membership_token}")
         return resp
 
     def delete_membership(self, membership_token: str) -> dict:
-        resp = self._delete(url_suffix=f"/memberships/{membership_token}")
+        resp = self._delete(url_suffix=f"/{self.account_name}/memberships/{membership_token}")
+        return resp
+
+    def get_user(self, username: str) -> dict:
+        resp = self._get(url_suffix=f"/{username}")
         return resp
