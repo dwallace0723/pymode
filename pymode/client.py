@@ -126,3 +126,11 @@ class Mode:
     def get_user(self, username: str) -> dict:
         resp = self._get(url_suffix=f"/{username}")
         return resp
+
+    def list_queries(self, report_token: str):
+        resp = self._get(url_suffix=f"/{self.account_name}/reports/{report_token}/queries")
+        return resp.get('_embedded').get('queries')
+
+    def get_query(self, report_token: str, query_token: str):
+        resp = self._get(url_suffix=f"/{self.account_name}/reports/{report_token}/queries/{query_token}")
+        return resp
