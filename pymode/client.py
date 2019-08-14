@@ -123,6 +123,11 @@ class Mode:
         )
         return resp
 
+    def create_invitation(self, invitee_email: str, message: str = None):
+        data = f'{{"invite": {{"invitee": {{"email": "{invitee_email}" }}, "message": "{message}"}}}}'
+        resp = self._post(url_suffix=f"/{self.account_name}/invites", data=data)
+        return resp
+
     def get_user(self, username: str) -> dict:
         resp = self._get(url_suffix=f"/{username}")
         return resp
