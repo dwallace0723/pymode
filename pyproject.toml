@@ -1,0 +1,14 @@
+[tool.black]
+line-length = 120
+include = '.py$'
+exclude = '''
+
+(
+  /(
+      \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.venv
+  )/
+)
+'''
