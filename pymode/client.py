@@ -52,17 +52,11 @@ class Mode(object):
         return headers
 
     def _request(
-        self, *, method: str, url: str, params: Optional[Dict] = None, json: Optional[Dict] = None,
+        self, *, method: str, url: str, params: Optional[Dict] = None, json: Optional[Dict] = None
     ) -> requests.Response:
         headers = self._construct_headers()
         response = requests.request(
-            method=method,
-            url=url,
-            auth=(self._token, self._password),
-            headers=headers,
-            params=params,
-            json=json,
-            timeout=30,
+            method=method, url=url, auth=(self._token, self._password), headers=headers, params=params, json=json
         )
         response.raise_for_status()
         return response
@@ -100,12 +94,12 @@ class Mode(object):
         resp = self._request(method="DELETE", url=url, params=params, json=json)
         return resp
 
-    def list_spaces(self) -> requests.Response:
-        resp = self._get_resource(resource="spaces")
+    def list_spaces(self, **kwargs) -> requests.Response:
+        resp = self._get_resource(resource="spaces", params=kwargs)
         return resp
 
-    def get_space(self, *, space_token: str) -> requests.Response:
-        resp = self._get_resource(resource=f"spaces/{space_token}")
+    def get_space(self, *, space_token: str, **kwargs) -> requests.Response:
+        resp = self._get_resource(resource=f"spaces/{space_token}", params=kwargs)
         return resp
 
     def create_space(self, *, space_type: str, name: str, description: Optional[str] = None) -> requests.Response:
@@ -132,14 +126,14 @@ class Mode(object):
         resp = self._delete_resource(resource=f"spaces/{space_token}")
         return resp
 
-    def list_memberships(self) -> requests.Response:
+    def list_memberships(self, **kwargs) -> requests.Response:
         "Retrieves all Memberships within an Organization."
-        resp = self._get_resource(resource="memberships")
+        resp = self._get_resource(resource="memberships", params=kwargs)
         return resp
 
-    def get_membership(self, *, membership_token: str) -> requests.Response:
+    def get_membership(self, *, membership_token: str, **kwargs) -> requests.Response:
         "Retrieves a specific Membership within an Organization."
-        resp = self._get_resource(resource=f"memberships/{membership_token}")
+        resp = self._get_resource(resource=f"memberships/{membership_token}", params=kwargs)
         return resp
 
     def delete_membership(self, *, membership_token: str) -> requests.Response:
@@ -154,14 +148,14 @@ class Mode(object):
         resp = self._post_resource(resource="invites", json=data)
         return resp
 
-    def list_space_memberships(self, *, space_token: str) -> requests.Response:
+    def list_space_memberships(self, *, space_token: str, **kwargs) -> requests.Response:
         "Retrieves all Memberships to a Space within an Organization."
-        resp = self._get_resource(resource=f"spaces/{space_token}/memberships")
+        resp = self._get_resource(resource=f"spaces/{space_token}/memberships", params=kwargs)
         return resp
 
-    def get_space_membership(self, *, space_token: str, space_membership_token: str) -> requests.Response:
+    def get_space_membership(self, *, space_token: str, space_membership_token: str, **kwargs) -> requests.Response:
         "Retrieves a specific Space Membership within an Organization."
-        resp = self._get_resource(resource=f"spaces/{space_token}/memberships/{space_membership_token}")
+        resp = self._get_resource(resource=f"spaces/{space_token}/memberships/{space_membership_token}", params=kwargs)
         return resp
 
     def create_space_membership(self, *, space_token: str, member_type: str, member_token: str) -> requests.Response:
@@ -179,14 +173,14 @@ class Mode(object):
         resp = self._delete_resource(resource=f"spaces/{space_token}/memberships/{membership_token}")
         return resp
 
-    def list_reports(self, *, space_token: str) -> requests.Response:
+    def list_reports(self, *, space_token: str, **kwargs) -> requests.Response:
         "Retrieves all Reports in a Space within an Organization."
-        resp = self._get_resource(resource=f"spaces/{space_token}/reports")
+        resp = self._get_resource(resource=f"spaces/{space_token}/reports", params=kwargs)
         return resp
 
-    def get_report(self, *, report_token: str) -> requests.Response:
+    def get_report(self, *, report_token: str, **kwargs) -> requests.Response:
         "Retrieves a specific Report within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}")
+        resp = self._get_resource(resource=f"reports/{report_token}", params=kwargs)
         return resp
 
     def update_report(self, *, report_token: str, **kwargs) -> requests.Response:
@@ -210,14 +204,14 @@ class Mode(object):
         resp = self._patch_resource(resource=f"reports/{report_token}/unarchive")
         return resp
 
-    def list_report_runs(self, *, report_token: str) -> requests.Response:
+    def list_report_runs(self, *, report_token: str, **kwargs) -> requests.Response:
         "Retrieves all Report Runs for a specific Report within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}/runs")
+        resp = self._get_resource(resource=f"reports/{report_token}/runs", params=kwargs)
         return resp
 
-    def get_report_run(self, *, report_token: str, report_run_token: str) -> requests.Response:
+    def get_report_run(self, *, report_token: str, report_run_token: str, **kwargs) -> requests.Response:
         "Retrieves a specific Report Run within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}/runs/{report_run_token}")
+        resp = self._get_resource(resource=f"reports/{report_token}/runs/{report_run_token}", params=kwargs)
         return resp
 
     def clone_report_run(self, *, report_token: str, report_run_token: str) -> requests.Response:
@@ -231,14 +225,14 @@ class Mode(object):
         resp = self._post_resource(resource=f"reports/{report_token}/runs", json=data)
         return resp
 
-    def list_queries(self, *, report_token: str) -> requests.Response:
+    def list_queries(self, *, report_token: str, **kwargs) -> requests.Response:
         "Retrieves all Queries in a specific Report within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}/queries")
+        resp = self._get_resource(resource=f"reports/{report_token}/queries", params=kwargs)
         return resp
 
-    def get_query(self, *, report_token: str, query_token: str) -> requests.Response:
+    def get_query(self, *, report_token: str, query_token: str, **kwargs) -> requests.Response:
         "Retrieves a specific Query within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}/queries/{query_token}")
+        resp = self._get_resource(resource=f"reports/{report_token}/queries/{query_token}", params=kwargs)
         return resp
 
     def create_query(self, *, report_token: str, data_source_id: str, raw_query: str, **kwargs) -> requests.Response:
@@ -262,20 +256,22 @@ class Mode(object):
         resp = self._delete_resource(resource=f"reports/{report_token}/queries/{query_token}")
         return resp
 
-    def list_query_runs(self, *, report_token: str, report_run_token: str) -> requests.Response:
+    def list_query_runs(self, *, report_token: str, report_run_token: str, **kwargs) -> requests.Response:
         "Retrieves all Query Runs in a specific Report Run within an Organization."
-        resp = self._get_resource(resource=f"reports/{report_token}/runs/{report_run_token}/query_runs")
+        resp = self._get_resource(resource=f"reports/{report_token}/runs/{report_run_token}/query_runs", params=kwargs)
         return resp
 
-    def get_query_run(self, *, report_token: str, report_run_token: str, query_run_token: str) -> requests.Response:
+    def get_query_run(
+        self, *, report_token: str, report_run_token: str, query_run_token: str, **kwargs
+    ) -> requests.Response:
         "Retrieves a specific Query Run within an Organization."
         resp = self._get_resource(
-            resource=f"reports/{report_token}/runs/{report_run_token}/query_runs/{query_run_token}"
+            resource=f"reports/{report_token}/runs/{report_run_token}/query_runs/{query_run_token}", params=kwargs
         )
         return resp
 
     def get_query_run_results(
-        self, *, report_token: str, report_run_token: str, query_run_token: str, file_type: str
+        self, *, report_token: str, report_run_token: str, query_run_token: str, file_type: str, **kwargs
     ) -> requests.Response:
         "Retrieves the result set for specific Query Run within an Organization."
 
@@ -283,23 +279,28 @@ class Mode(object):
             raise ValueError("Parameter 'file_type' must be either 'csv' or 'json'.")
 
         resp = self._get_resource(
-            resource=f"reports/{report_token}/runs/{report_run_token}/query_runs/{query_run_token}/results/content.{file_type}"
+            resource=f"reports/{report_token}/runs/{report_run_token}/query_runs/{query_run_token}/results/content.{file_type}",
+            params=kwargs,
         )
         return resp
 
-    def get_report_run_results(self, *, report_token: str, report_run_token: str, file_type: str) -> requests.Response:
+    def get_report_run_results(
+        self, *, report_token: str, report_run_token: str, file_type: str, **kwargs
+    ) -> requests.Response:
         "Retrieves the result set for specific Report Run within an Organization."
 
         if file_type not in ["csv", "json"]:
             raise ValueError("Parameter 'file_type' must be either 'csv' or 'json'.")
 
         resp = self._get_resource(
-            resource=f"reports/{report_token}/runs/{report_run_token}/results/content.{file_type}"
+            resource=f"reports/{report_token}/runs/{report_run_token}/results/content.{file_type}", params=kwargs
         )
         return resp
 
-    def get_report_run_pdf(self, *, report_token: str, report_run_token: str) -> requests.Response:
+    def get_report_run_pdf(self, *, report_token: str, report_run_token: str, **kwargs) -> requests.Response:
         "Retrieves the result set for specific Report Run within an Organization."
 
-        resp = self._get_resource(resource=f"reports/{report_token}/exports/runs/{report_run_token}/format/download")
+        resp = self._get_resource(
+            resource=f"reports/{report_token}/exports/runs/{report_run_token}/format/download", params=kwargs
+        )
         return resp
